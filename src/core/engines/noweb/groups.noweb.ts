@@ -42,6 +42,9 @@ export function ToGroupInfo(group: Partial<GroupMetadata>): GroupInfo {
     membersCanAddNewMember: group.memberAddMode,
     membersCanSendMessages: group.announce,
     newMembersApprovalRequired: group.joinApprovalMode,
+    isParent: group.isCommunity,
+    linkedParentId: group.linkedParent,
+    isDefaultSubGroup: group.isCommunityAnnounce,
   };
 }
 

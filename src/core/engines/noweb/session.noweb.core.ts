@@ -176,6 +176,7 @@ import {
   SettingsMembershipApproval,
   SettingsSecurityChangeInfo,
   GroupParticipantTag,
+  SubGroupInfo,
 } from '@waha/structures/groups.dto';
 import { GroupV2ParticipantsTagEvent } from '@waha/structures/groups.events.dto';
 import {
@@ -2166,9 +2167,73 @@ export class WhatsappSessionNoWebCore extends WhatsappSession {
   }
 
   @Activity()
-  public createGroup(request: CreateGroupRequest) {
+  public async createGroup(request: CreateGroupRequest) {
     const participants = request.participants.map(getId);
+    if (request.isParent) {
+      // No description field on the WAHA request, communityCreate takes (subject, body)
+      const community = await this.sock.communityCreate(request.name, '');
+      if (!community) {
+        throw new Error('Failed to create community');
+      }
+      if (participants.length > 0) {
+        // communityCreate takes no participants, add them to the new community
+        await this.addParticipants(community.id, {
+          participants: request.participants,
+        });
+      }
+      return community;
+    }
+    if (request.linkedParentId) {
+      return this.sock.communityCreateGroup(
+        request.name,
+        participants,
+        request.linkedParentId,
+      );
+    }
     return this.sock.groupCreate(request.name, participants);
+  }
+
+  @Activity()
+  public async linkGroup(id: string, groupId: string) {
+    await this.sock.communityLinkGroup(groupId, id);
+    return;
+  }
+
+  @Activity()
+  public async unlinkGroup(id: string, groupId: string) {
+    await this.sock.communityUnlinkGroup(groupId, id);
+    return;
+  }
+
+  public async getSubGroups(id: string): Promise<SubGroupInfo[]> {
+    const result = await this.sock.communityFetchLinkedGroups(id);
+    const subGroups: SubGroupInfo[] = [];
+    for (const group of result.linkedGroups) {
+      // Baileys types id as optional, the server always sends it
+      if (!group.id) {
+        continue;
+      }
+      subGroups.push({
+        id: group.id,
+        name: group.subject,
+        // Slim linked-group objects carry no default-subgroup flag
+        isDefaultSubGroup: false,
+      });
+    }
+    return subGroups;
+  }
+
+  public async getLinkedGroupsParticipants(id: string): Promise<string[]> {
+    // Never communityMetadata() - broken, see WhiskeySockets/Baileys#2753
+    const subGroups = await this.getSubGroups(id);
+    const ids = new Set<string>();
+    for (const subGroup of subGroups) {
+      const metadata = await this.sock.groupMetadata(subGroup.id);
+      for (const participant of metadata.participants ?? []) {
+        ids.add(ToGroupParticipant(participant).id);
+      }
+    }
+    return [...ids];
   }
 
   @Activity()
