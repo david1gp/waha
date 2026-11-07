@@ -119,6 +119,7 @@ import {
   SettingsMemberShareHistoryMode,
   SettingsMembershipApproval,
   SettingsSecurityChangeInfo,
+  SubGroupInfo,
 } from '../../structures/groups.dto';
 import { WAHAChatPresences } from '../../structures/presence.dto';
 import {
@@ -1187,6 +1188,22 @@ export abstract class WhatsappSession {
   }
 
   public demoteParticipantsToUser(id, request: ParticipantsRequest) {
+    throw new NotImplementedByEngineError();
+  }
+
+  public linkGroup(id: string, groupId: string) {
+    throw new NotImplementedByEngineError();
+  }
+
+  public unlinkGroup(id: string, groupId: string) {
+    throw new NotImplementedByEngineError();
+  }
+
+  public getSubGroups(id: string): Promise<SubGroupInfo[]> {
+    throw new NotImplementedByEngineError();
+  }
+
+  public getLinkedGroupsParticipants(id: string): Promise<string[]> {
     throw new NotImplementedByEngineError();
   }
 

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -38,6 +39,7 @@ import {
   GroupMemberTagRequest,
   GroupParticipant,
   GroupParticipantTag,
+  GroupLinkRequest,
   GroupsListFields,
   GroupsPaginationParams,
   JoinGroupRequest,
@@ -47,6 +49,7 @@ import {
   SettingsMemberShareHistoryMode,
   SettingsMembershipApproval,
   SettingsSecurityChangeInfo,
+  SubGroupInfo,
   SubjectRequest,
 } from '../structures/groups.dto';
 import { PoliciesGuard } from '@waha/core/auth/policies.guard';
@@ -70,6 +73,14 @@ export class GroupsController {
     @WorkingSessionParam session: WhatsappSession,
     @Body() request: CreateGroupRequest,
   ) {
+    // No class-level cross-field validator exists in the repo (see
+    // presence.controller.ts), so the mutual exclusion is enforced here.
+    if (request.isParent && request.linkedParentId) {
+      throw new BadRequestException({
+        detail:
+          "'isParent' and 'linkedParentId' are mutually exclusive - either create a community or create a subgroup in it.",
+      });
+    }
     return session.createGroup(request);
   }
 
@@ -651,5 +662,61 @@ export class GroupsController {
     @Body() request: ParticipantsRequest,
   ) {
     return session.demoteParticipantsToUser(id, request);
+  }
+
+  @Post(':id/link')
+  @HttpCode(HttpStatus.OK)
+  @SessionApiParam
+  @GroupIdApiParam
+  @CheckPolicies(CanSession(Action.Send, FromParam('session')))
+  @ApiOperation({ summary: 'Link a group to the community.' })
+  @UsePipes(new WAHAValidationPipe())
+  linkGroup(
+    @WorkingSessionParam session: WhatsappSession,
+    @Param('id') id: string,
+    @Body() request: GroupLinkRequest,
+  ) {
+    return session.linkGroup(id, request.groupId);
+  }
+
+  @Post(':id/unlink')
+  @HttpCode(HttpStatus.OK)
+  @SessionApiParam
+  @GroupIdApiParam
+  @CheckPolicies(CanSession(Action.Send, FromParam('session')))
+  @ApiOperation({ summary: 'Unlink a group from the community.' })
+  @UsePipes(new WAHAValidationPipe())
+  unlinkGroup(
+    @WorkingSessionParam session: WhatsappSession,
+    @Param('id') id: string,
+    @Body() request: GroupLinkRequest,
+  ) {
+    return session.unlinkGroup(id, request.groupId);
+  }
+
+  @Get(':id/subgroups')
+  @SessionApiParam
+  @GroupIdApiParam
+  @CheckPolicies(CanSession(Action.Read, FromParam('session')))
+  @ApiOperation({ summary: 'Get the subgroups of the community.' })
+  getSubGroups(
+    @WorkingSessionParam session: WhatsappSession,
+    @Param('id') id: string,
+  ): Promise<SubGroupInfo[]> {
+    return session.getSubGroups(id);
+  }
+
+  @Get(':id/linked-participants')
+  @SessionApiParam
+  @GroupIdApiParam
+  @CheckPolicies(CanSession(Action.Read, FromParam('session')))
+  @ApiOperation({
+    summary: 'Get participants across all subgroups of the community.',
+  })
+  getLinkedGroupsParticipants(
+    @WorkingSessionParam session: WhatsappSession,
+    @Param('id') id: string,
+  ): Promise<string[]> {
+    return session.getLinkedGroupsParticipants(id);
   }
 }

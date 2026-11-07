@@ -177,6 +177,55 @@ export class CreateGroupRequest {
 
   @IsArray()
   participants: Array<Participant>;
+
+  @ApiProperty({
+    description:
+      'Create the group as a community parent. Mutually exclusive with linkedParentId.',
+    required: false,
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isParent?: boolean;
+
+  @ApiProperty({
+    description:
+      'ID of the parent community to create the group in as a subgroup. Mutually exclusive with isParent.',
+    required: false,
+    example: '123456789@g.us',
+  })
+  @IsOptional()
+  @IsString()
+  linkedParentId?: string;
+}
+
+export class GroupLinkRequest {
+  @ApiProperty({
+    description: 'ID of the subgroup to link to (or unlink from) the community.',
+    example: '123456789@g.us',
+  })
+  @IsString()
+  @IsNotEmpty()
+  groupId: string;
+}
+
+export class SubGroupInfo {
+  @ApiProperty({
+    example: '123456789@g.us',
+  })
+  id: string;
+
+  @ApiProperty({
+    example: 'Group Name',
+  })
+  name: string;
+
+  @ApiProperty({
+    description:
+      'Whether the subgroup is the community announcement (default) group.',
+    example: false,
+  })
+  isDefaultSubGroup: boolean;
 }
 
 export class JoinGroupRequest {
@@ -321,4 +370,24 @@ export class GroupInfo {
     description: 'Admin approval required for new members',
   })
   newMembersApprovalRequired: boolean;
+
+  @ApiProperty({
+    description: 'Whether the group is a community parent',
+    example: false,
+  })
+  isParent?: boolean;
+
+  @ApiProperty({
+    description: 'ID of the parent community, present when the group is a subgroup',
+    required: false,
+    example: '123456789@g.us',
+  })
+  linkedParentId?: string;
+
+  @ApiProperty({
+    description:
+      'Whether the group is the community announcement (default) subgroup',
+    example: false,
+  })
+  isDefaultSubGroup?: boolean;
 }
