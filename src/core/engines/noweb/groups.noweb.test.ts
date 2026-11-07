@@ -1,5 +1,8 @@
 import type { GroupMetadata } from '@adiwajshing/baileys';
-import { ToGroupInfo } from '@waha/core/engines/noweb/groups.noweb';
+import {
+  selectAnnouncementSubGroupId,
+  ToGroupInfo,
+} from '@waha/core/engines/noweb/groups.noweb';
 
 function baseMetadata(): GroupMetadata {
   return {
@@ -37,5 +40,36 @@ describe('ToGroupInfo', () => {
     expect(info.isParent).toBeUndefined();
     expect(info.linkedParentId).toBeUndefined();
     expect(info.isDefaultSubGroup).toBeUndefined();
+  });
+});
+
+function announceMetadata(
+  id: string,
+  isCommunityAnnounce?: boolean,
+): Partial<GroupMetadata> {
+  return { id: id, subject: `Subgroup ${id}`, isCommunityAnnounce };
+}
+
+describe('selectAnnouncementSubGroupId', () => {
+  it('returns the announce subgroup id', () => {
+    expect(
+      selectAnnouncementSubGroupId([
+        announceMetadata('111@g.us', false),
+        announceMetadata('222@g.us', true),
+      ]),
+    ).toBe('222@g.us');
+  });
+
+  it('returns undefined when no subgroup is announce', () => {
+    expect(
+      selectAnnouncementSubGroupId([
+        announceMetadata('111@g.us', false),
+        announceMetadata('222@g.us'),
+      ]),
+    ).toBeUndefined();
+  });
+
+  it('returns undefined for an empty list', () => {
+    expect(selectAnnouncementSubGroupId([])).toBeUndefined();
   });
 });

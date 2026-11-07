@@ -258,6 +258,17 @@ export function ToGroupV2ParticipantsJoinRequestEvent(
   };
 }
 
+/**
+ * Announcement subgroup id for routing ordinary member adds addressed to a
+ * community parent. Reads isCommunityAnnounce from full groupMetadata -
+ * never the getSubGroups() mapped flag (always false). Undefined when none.
+ */
+export function selectAnnouncementSubGroupId(
+  metadatas: Array<Partial<GroupMetadata>>,
+): string | undefined {
+  return metadatas.find((metadata) => metadata?.isCommunityAnnounce)?.id;
+}
+
 export function ToGroupV2LeaveEvent(
   me: Contact,
   update: GroupParticipantUpdate,

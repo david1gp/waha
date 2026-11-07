@@ -52,6 +52,7 @@ import {
   WhatsappSession,
 } from '@waha/core/abc/session.abc';
 import {
+  selectAnnouncementSubGroupId,
   ToGroupJoinRequest,
   ToGroupJoinRequestResult,
   ToGroupParticipant,
@@ -2474,8 +2475,35 @@ export class WhatsappSessionNoWebCore extends WhatsappSession {
 
   @Activity()
   public async addParticipants(id, request: ParticipantsRequest) {
+    const targetId = await this.resolveCommunityMembersTarget(id);
     const participants = request.participants.map(getId);
-    return this.sock.groupParticipantsUpdate(id, participants, 'add');
+    return this.sock.groupParticipantsUpdate(targetId, participants, 'add');
+  }
+
+  /**
+   * A community parent's participants are its admins - route ordinary member
+   * adds to the announcement subgroup instead. Detection and selection go
+   * through groupMetadata() only (never communityMetadata(), it is broken -
+   * WhiskeySockets/Baileys#2753) and ignore the getSubGroups() mapped flag
+   * (always false). Other actions stay addressed to the JID supplied.
+   */
+  private async resolveCommunityMembersTarget(id: string): Promise<string> {
+    const group = await this.sock.groupMetadata(id);
+    if (!group?.isCommunity) {
+      return id;
+    }
+    const subGroups = await this.getSubGroups(id);
+    const metadatas: Array<Partial<GroupMetadata>> = [];
+    for (const subGroup of subGroups) {
+      metadatas.push(await this.sock.groupMetadata(subGroup.id));
+    }
+    const targetId = selectAnnouncementSubGroupId(metadatas);
+    if (!targetId) {
+      throw new UnprocessableEntityException(
+        `Can not add participants to community '${id}' - no announcement subgroup found`,
+      );
+    }
+    return targetId;
   }
 
   @Activity()

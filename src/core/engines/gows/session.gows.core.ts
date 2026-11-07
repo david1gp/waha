@@ -15,6 +15,7 @@ import { Jid } from '@waha/core/engines/const';
 import { EventsFromObservable } from '@waha/core/engines/gows/EventsFromObservable';
 import { GowsEventStreamObservable } from '@waha/core/engines/gows/GowsEventStreamObservable';
 import {
+  selectDefaultSubGroupId,
   ToGroupJoinRequest,
   ToGroupJoinRequestResult,
   ToGroupParticipants,
@@ -2181,9 +2182,29 @@ export class WhatsappSessionGoWSCore extends WhatsappSession {
   }
 
   @Activity()
-  public addParticipants(id: string, request: ParticipantsRequest) {
+  public async addParticipants(id: string, request: ParticipantsRequest) {
+    const targetId = await this.resolveCommunityMembersTarget(id);
     const action = messages.ParticipantAction.ADD;
-    return this.updateParticipants(id, request.participants, action);
+    return this.updateParticipants(targetId, request.participants, action);
+  }
+
+  /**
+   * A community parent's participants are its admins - route ordinary member
+   * adds to the announcement (default) subgroup instead. Other actions stay
+   * addressed to the JID the caller supplied.
+   */
+  private async resolveCommunityMembersTarget(id: string): Promise<string> {
+    const group = await this.getGroup(id);
+    if (!group?.IsParent) {
+      return id;
+    }
+    const targetId = selectDefaultSubGroupId(await this.getSubGroups(id));
+    if (!targetId) {
+      throw new UnprocessableEntityException(
+        `Can not add participants to community '${id}' - no default subgroup found`,
+      );
+    }
+    return targetId;
   }
 
   @Activity()

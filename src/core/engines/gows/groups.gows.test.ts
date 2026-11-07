@@ -1,7 +1,9 @@
 import {
+  selectDefaultSubGroupId,
   ToGroupInfo,
   ToSubGroupInfo,
 } from '@waha/core/engines/gows/groups.gows';
+import { SubGroupInfo } from '@waha/structures/groups.dto';
 import {
   GOWSSubGroup,
   GroupInfoFull,
@@ -83,5 +85,36 @@ describe('ToSubGroupInfo', () => {
       name: 'Subgroup',
       isDefaultSubGroup: false,
     });
+  });
+});
+
+function subGroupInfo(
+  id: string,
+  isDefaultSubGroup: boolean,
+): SubGroupInfo {
+  return { id: id, name: `Subgroup ${id}`, isDefaultSubGroup };
+}
+
+describe('selectDefaultSubGroupId', () => {
+  it('returns the default subgroup id', () => {
+    expect(
+      selectDefaultSubGroupId([
+        subGroupInfo('111@g.us', false),
+        subGroupInfo('222@g.us', true),
+      ]),
+    ).toBe('222@g.us');
+  });
+
+  it('returns undefined when no subgroup is default', () => {
+    expect(
+      selectDefaultSubGroupId([
+        subGroupInfo('111@g.us', false),
+        subGroupInfo('222@g.us', false),
+      ]),
+    ).toBeUndefined();
+  });
+
+  it('returns undefined for an empty list', () => {
+    expect(selectDefaultSubGroupId([])).toBeUndefined();
   });
 });

@@ -162,6 +162,16 @@ export function ToSubGroupInfo(group: GOWSSubGroup): SubGroupInfo {
   };
 }
 
+/**
+ * Announcement (default) subgroup id for routing ordinary member adds
+ * addressed to a community parent. Undefined when there is none.
+ */
+export function selectDefaultSubGroupId(
+  subGroups: SubGroupInfo[],
+): string | undefined {
+  return subGroups.find((subGroup) => subGroup.isDefaultSubGroup)?.id;
+}
+
 function ToGroupInfoPartial(group: GroupInfoEvent): GroupInfo | null {
   const announce: boolean | undefined = group.Announce?.IsAnnounce;
   let membersCanSendMessages: boolean | undefined;
