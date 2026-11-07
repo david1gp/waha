@@ -103,6 +103,19 @@ export interface GroupInfoFull {
   MemberAddMode: string; // all_member_add | admin_add
   MemberShareHistoryMode: string; // all_member_share | admin_share
   IsJoinApprovalRequired: boolean;
+  IsParent?: boolean; // true when the group is a community parent
+  LinkedParentJID?: JID; // community JID when the group is a subgroup, '' when not
+  IsDefaultSubGroup?: boolean; // true for the community announcement (default) subgroup
+}
+
+// GetSubGroups RPC result item (whatsmeow GroupLinkTarget as JSON)
+export interface GOWSSubGroup {
+  JID: JID;
+  Name: string;
+  NameSetAt: string;
+  NameSetBy: JID;
+  NameSetByPN: JID;
+  IsDefaultSubGroup: boolean;
 }
 
 export interface JoinedGroupEvent extends GroupInfoFull {

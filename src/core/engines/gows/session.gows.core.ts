@@ -23,11 +23,13 @@ import {
   ToGroupV2ParticipantsJoinRequestEvents,
   ToGroupV2ParticipantsEvents,
   ToGroupV2UpdateEvent,
+  ToSubGroupInfo,
 } from '@waha/core/engines/gows/groups.gows';
 import {
   GOWSGroupParticipant,
   GOWSGroupParticipantRequest,
   GOWSGroupMemberLabel,
+  GOWSSubGroup,
 } from '@waha/core/engines/gows/types.group';
 import { messages } from '@waha/core/engines/gows/grpc/gows';
 import {
@@ -140,6 +142,7 @@ import {
   SettingsMemberShareHistoryMode,
   SettingsMembershipApproval,
   SettingsSecurityChangeInfo,
+  SubGroupInfo,
 } from '@waha/structures/groups.dto';
 import { GroupV2ParticipantsTagEvent } from '@waha/structures/groups.events.dto';
 import { ReplyToMessage } from '@waha/structures/message.dto';
@@ -1747,10 +1750,56 @@ export class WhatsappSessionGoWSCore extends WhatsappSession {
       session: this.session,
       name: request.name,
       participants: participants,
+      is_parent: request.isParent ?? false,
+      linked_parent_jid: request.linkedParentId ?? '',
     });
     const response = await promisify(this.client.CreateGroup)(req);
     const data = parseJson(response);
     return data;
+  }
+
+  @Activity()
+  public async linkGroup(id: string, groupId: string) {
+    const req = new messages.GroupLinkRequest({
+      session: this.session,
+      jid: id,
+      group_id: groupId,
+    });
+    await promisify(this.client.LinkGroup)(req);
+    return;
+  }
+
+  @Activity()
+  public async unlinkGroup(id: string, groupId: string) {
+    const req = new messages.GroupLinkRequest({
+      session: this.session,
+      jid: id,
+      group_id: groupId,
+    });
+    await promisify(this.client.UnlinkGroup)(req);
+    return;
+  }
+
+  public async getSubGroups(id: string): Promise<SubGroupInfo[]> {
+    const req = new messages.JidRequest({
+      session: this.session,
+      jid: id,
+    });
+    const response = await promisify(this.client.GetSubGroups)(req);
+    const subGroups: GOWSSubGroup[] = parseJsonList(response);
+    return subGroups.map(ToSubGroupInfo);
+  }
+
+  public async getLinkedGroupsParticipants(id: string): Promise<string[]> {
+    const req = new messages.JidRequest({
+      session: this.session,
+      jid: id,
+    });
+    const response = await promisify(this.client.GetLinkedGroupsParticipants)(
+      req,
+    );
+    const participants: string[] = parseJsonList(response);
+    return participants.map((jid) => toCusFormat(jid));
   }
 
   @Activity()

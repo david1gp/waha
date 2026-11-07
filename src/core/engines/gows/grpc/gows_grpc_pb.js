@@ -257,6 +257,17 @@ function deserialize_messages_GroupCodeRequest(buffer_arg) {
   return gows_pb.GroupCodeRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_messages_GroupLinkRequest(arg) {
+  if (!(arg instanceof gows_pb.GroupLinkRequest)) {
+    throw new Error('Expected argument of type messages.GroupLinkRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_messages_GroupLinkRequest(buffer_arg) {
+  return gows_pb.GroupLinkRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_messages_GroupMemberRequest(arg) {
   if (!(arg instanceof gows_pb.GroupMemberRequest)) {
     throw new Error('Expected argument of type messages.GroupMemberRequest');
@@ -1173,6 +1184,50 @@ updateGroupParticipants: {
     responseType: gows_pb.JsonList,
     requestSerialize: serialize_messages_UpdateRequestParticipantsRequest,
     requestDeserialize: deserialize_messages_UpdateRequestParticipantsRequest,
+    responseSerialize: serialize_messages_JsonList,
+    responseDeserialize: deserialize_messages_JsonList,
+  },
+  linkGroup: {
+    path: '/messages.MessageService/LinkGroup',
+    requestStream: false,
+    responseStream: false,
+    requestType: gows_pb.GroupLinkRequest,
+    responseType: gows_pb.Empty,
+    requestSerialize: serialize_messages_GroupLinkRequest,
+    requestDeserialize: deserialize_messages_GroupLinkRequest,
+    responseSerialize: serialize_messages_Empty,
+    responseDeserialize: deserialize_messages_Empty,
+  },
+  unlinkGroup: {
+    path: '/messages.MessageService/UnlinkGroup',
+    requestStream: false,
+    responseStream: false,
+    requestType: gows_pb.GroupLinkRequest,
+    responseType: gows_pb.Empty,
+    requestSerialize: serialize_messages_GroupLinkRequest,
+    requestDeserialize: deserialize_messages_GroupLinkRequest,
+    responseSerialize: serialize_messages_Empty,
+    responseDeserialize: deserialize_messages_Empty,
+  },
+  getSubGroups: {
+    path: '/messages.MessageService/GetSubGroups',
+    requestStream: false,
+    responseStream: false,
+    requestType: gows_pb.JidRequest,
+    responseType: gows_pb.JsonList,
+    requestSerialize: serialize_messages_JidRequest,
+    requestDeserialize: deserialize_messages_JidRequest,
+    responseSerialize: serialize_messages_JsonList,
+    responseDeserialize: deserialize_messages_JsonList,
+  },
+  getLinkedGroupsParticipants: {
+    path: '/messages.MessageService/GetLinkedGroupsParticipants',
+    requestStream: false,
+    responseStream: false,
+    requestType: gows_pb.JidRequest,
+    responseType: gows_pb.JsonList,
+    requestSerialize: serialize_messages_JidRequest,
+    requestDeserialize: deserialize_messages_JidRequest,
     responseSerialize: serialize_messages_JsonList,
     responseDeserialize: deserialize_messages_JsonList,
   },

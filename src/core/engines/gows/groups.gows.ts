@@ -2,6 +2,7 @@ import {
   GOWSGroupJoinRequest,
   GOWSGroupParticipant,
   GOWSGroupParticipantRequest,
+  GOWSSubGroup,
   GroupInfoEvent,
   GroupInfoFull,
   GroupJoinRequestEvent,
@@ -16,6 +17,7 @@ import {
   GroupParticipant,
   GroupParticipantRole,
   NormalizeJoinRequestMethod,
+  SubGroupInfo,
 } from '@waha/structures/groups.dto';
 import {
   GroupParticipantsJoinRequestAction,
@@ -133,7 +135,7 @@ function getParticipants(jids: string[] | null, type: GroupParticipantType) {
   return participants;
 }
 
-function ToGroupInfo(group: GroupInfoFull): GroupInfo {
+export function ToGroupInfo(group: GroupInfoFull): GroupInfo {
   const participants: GroupParticipant[] = ToGroupParticipants(
     group.Participants,
   );
@@ -146,6 +148,17 @@ function ToGroupInfo(group: GroupInfoFull): GroupInfo {
     membersCanAddNewMember: group.MemberAddMode === 'all_member_add',
     membersCanSendMessages: !!group.IsAnnounce,
     newMembersApprovalRequired: group.IsJoinApprovalRequired,
+    isParent: group.IsParent,
+    linkedParentId: group.LinkedParentJID || undefined,
+    isDefaultSubGroup: group.IsDefaultSubGroup,
+  };
+}
+
+export function ToSubGroupInfo(group: GOWSSubGroup): SubGroupInfo {
+  return {
+    id: group.JID,
+    name: group.Name,
+    isDefaultSubGroup: group.IsDefaultSubGroup ?? false,
   };
 }
 

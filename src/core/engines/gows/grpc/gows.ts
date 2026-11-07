@@ -2734,6 +2734,8 @@ export namespace messages {
             session?: Session;
             name?: string;
             participants?: string[];
+            is_parent?: boolean;
+            linked_parent_jid?: string;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [3], this.#one_of_decls);
@@ -2746,6 +2748,12 @@ export namespace messages {
                 }
                 if ("participants" in data && data.participants != undefined) {
                     this.participants = data.participants;
+                }
+                if ("is_parent" in data && data.is_parent != undefined) {
+                    this.is_parent = data.is_parent;
+                }
+                if ("linked_parent_jid" in data && data.linked_parent_jid != undefined) {
+                    this.linked_parent_jid = data.linked_parent_jid;
                 }
             }
         }
@@ -2770,10 +2778,24 @@ export namespace messages {
         set participants(value: string[]) {
             pb_1.Message.setField(this, 3, value);
         }
+        get is_parent() {
+            return pb_1.Message.getFieldWithDefault(this, 4, false) as boolean;
+        }
+        set is_parent(value: boolean) {
+            pb_1.Message.setField(this, 4, value);
+        }
+        get linked_parent_jid() {
+            return pb_1.Message.getFieldWithDefault(this, 5, "") as string;
+        }
+        set linked_parent_jid(value: string) {
+            pb_1.Message.setField(this, 5, value);
+        }
         static fromObject(data: {
             session?: ReturnType<typeof Session.prototype.toObject>;
             name?: string;
             participants?: string[];
+            is_parent?: boolean;
+            linked_parent_jid?: string;
         }): CreateGroupRequest {
             const message = new CreateGroupRequest({});
             if (data.session != null) {
@@ -2785,6 +2807,12 @@ export namespace messages {
             if (data.participants != null) {
                 message.participants = data.participants;
             }
+            if (data.is_parent != null) {
+                message.is_parent = data.is_parent;
+            }
+            if (data.linked_parent_jid != null) {
+                message.linked_parent_jid = data.linked_parent_jid;
+            }
             return message;
         }
         toObject() {
@@ -2792,6 +2820,8 @@ export namespace messages {
                 session?: ReturnType<typeof Session.prototype.toObject>;
                 name?: string;
                 participants?: string[];
+                is_parent?: boolean;
+                linked_parent_jid?: string;
             } = {};
             if (this.session != null) {
                 data.session = this.session.toObject();
@@ -2801,6 +2831,12 @@ export namespace messages {
             }
             if (this.participants != null) {
                 data.participants = this.participants;
+            }
+            if (this.is_parent != null) {
+                data.is_parent = this.is_parent;
+            }
+            if (this.linked_parent_jid != null) {
+                data.linked_parent_jid = this.linked_parent_jid;
             }
             return data;
         }
@@ -2814,6 +2850,10 @@ export namespace messages {
                 writer.writeString(2, this.name);
             if (this.participants.length)
                 writer.writeRepeatedString(3, this.participants);
+            if (this.is_parent != false)
+                writer.writeBool(4, this.is_parent);
+            if (this.linked_parent_jid.length)
+                writer.writeString(5, this.linked_parent_jid);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -2832,6 +2872,12 @@ export namespace messages {
                     case 3:
                         pb_1.Message.addToRepeatedField(message, 3, reader.readString());
                         break;
+                    case 4:
+                        message.is_parent = reader.readBool();
+                        break;
+                    case 5:
+                        message.linked_parent_jid = reader.readString();
+                        break;
                     default: reader.skipField();
                 }
             }
@@ -2842,6 +2888,122 @@ export namespace messages {
         }
         static deserializeBinary(bytes: Uint8Array): CreateGroupRequest {
             return CreateGroupRequest.deserialize(bytes);
+        }
+    }
+    export class GroupLinkRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            session?: Session;
+            jid?: string;
+            group_id?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("session" in data && data.session != undefined) {
+                    this.session = data.session;
+                }
+                if ("jid" in data && data.jid != undefined) {
+                    this.jid = data.jid;
+                }
+                if ("group_id" in data && data.group_id != undefined) {
+                    this.group_id = data.group_id;
+                }
+            }
+        }
+        get session() {
+            return pb_1.Message.getWrapperField(this, Session, 1) as Session;
+        }
+        set session(value: Session) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_session() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get jid() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set jid(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get group_id() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set group_id(value: string) {
+            pb_1.Message.setField(this, 3, value);
+        }
+        static fromObject(data: {
+            session?: ReturnType<typeof Session.prototype.toObject>;
+            jid?: string;
+            group_id?: string;
+        }): GroupLinkRequest {
+            const message = new GroupLinkRequest({});
+            if (data.session != null) {
+                message.session = Session.fromObject(data.session);
+            }
+            if (data.jid != null) {
+                message.jid = data.jid;
+            }
+            if (data.group_id != null) {
+                message.group_id = data.group_id;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                session?: ReturnType<typeof Session.prototype.toObject>;
+                jid?: string;
+                group_id?: string;
+            } = {};
+            if (this.session != null) {
+                data.session = this.session.toObject();
+            }
+            if (this.jid != null) {
+                data.jid = this.jid;
+            }
+            if (this.group_id != null) {
+                data.group_id = this.group_id;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_session)
+                writer.writeMessage(1, this.session, () => this.session.serialize(writer));
+            if (this.jid.length)
+                writer.writeString(2, this.jid);
+            if (this.group_id.length)
+                writer.writeString(3, this.group_id);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GroupLinkRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GroupLinkRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.session, () => message.session = Session.deserialize(reader));
+                        break;
+                    case 2:
+                        message.jid = reader.readString();
+                        break;
+                    case 3:
+                        message.group_id = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GroupLinkRequest {
+            return GroupLinkRequest.deserialize(bytes);
         }
     }
     export class SetPictureRequest extends pb_1.Message {
@@ -11986,6 +12148,42 @@ export namespace messages {
                 responseSerialize: (message: JsonList) => Buffer.from(message.serialize()),
                 responseDeserialize: (bytes: Buffer) => JsonList.deserialize(new Uint8Array(bytes))
             },
+            LinkGroup: {
+                path: "/messages.MessageService/LinkGroup",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: GroupLinkRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => GroupLinkRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: Empty) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => Empty.deserialize(new Uint8Array(bytes))
+            },
+            UnlinkGroup: {
+                path: "/messages.MessageService/UnlinkGroup",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: GroupLinkRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => GroupLinkRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: Empty) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => Empty.deserialize(new Uint8Array(bytes))
+            },
+            GetSubGroups: {
+                path: "/messages.MessageService/GetSubGroups",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: JidRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => JidRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: JsonList) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => JsonList.deserialize(new Uint8Array(bytes))
+            },
+            GetLinkedGroupsParticipants: {
+                path: "/messages.MessageService/GetLinkedGroupsParticipants",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: JidRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => JidRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: JsonList) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => JsonList.deserialize(new Uint8Array(bytes))
+            },
             GetProfilePicture: {
                 path: "/messages.MessageService/GetProfilePicture",
                 requestStream: false,
@@ -12376,6 +12574,10 @@ export namespace messages {
         abstract SetGroupJoinApprovalMode(call: grpc_1.ServerUnaryCall<JidBoolRequest, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
         abstract GetGroupRequestParticipants(call: grpc_1.ServerUnaryCall<JidRequest, JsonList>, callback: grpc_1.sendUnaryData<JsonList>): void;
         abstract UpdateGroupRequestParticipants(call: grpc_1.ServerUnaryCall<UpdateRequestParticipantsRequest, JsonList>, callback: grpc_1.sendUnaryData<JsonList>): void;
+        abstract LinkGroup(call: grpc_1.ServerUnaryCall<GroupLinkRequest, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
+        abstract UnlinkGroup(call: grpc_1.ServerUnaryCall<GroupLinkRequest, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
+        abstract GetSubGroups(call: grpc_1.ServerUnaryCall<JidRequest, JsonList>, callback: grpc_1.sendUnaryData<JsonList>): void;
+        abstract GetLinkedGroupsParticipants(call: grpc_1.ServerUnaryCall<JidRequest, JsonList>, callback: grpc_1.sendUnaryData<JsonList>): void;
         abstract GetProfilePicture(call: grpc_1.ServerUnaryCall<ProfilePictureRequest, ProfilePictureResponse>, callback: grpc_1.sendUnaryData<ProfilePictureResponse>): void;
         abstract SendPresence(call: grpc_1.ServerUnaryCall<PresenceRequest, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
         abstract SendChatPresence(call: grpc_1.ServerUnaryCall<ChatPresenceRequest, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
@@ -12530,6 +12732,18 @@ export namespace messages {
         };
         UpdateGroupRequestParticipants: GrpcUnaryServiceInterface<UpdateRequestParticipantsRequest, JsonList> = (message: UpdateRequestParticipantsRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<JsonList>, options?: grpc_1.CallOptions | grpc_1.requestCallback<JsonList>, callback?: grpc_1.requestCallback<JsonList>): grpc_1.ClientUnaryCall => {
             return super.UpdateGroupRequestParticipants(message, metadata, options, callback);
+        };
+        LinkGroup: GrpcUnaryServiceInterface<GroupLinkRequest, Empty> = (message: GroupLinkRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<Empty>, options?: grpc_1.CallOptions | grpc_1.requestCallback<Empty>, callback?: grpc_1.requestCallback<Empty>): grpc_1.ClientUnaryCall => {
+            return super.LinkGroup(message, metadata, options, callback);
+        };
+        UnlinkGroup: GrpcUnaryServiceInterface<GroupLinkRequest, Empty> = (message: GroupLinkRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<Empty>, options?: grpc_1.CallOptions | grpc_1.requestCallback<Empty>, callback?: grpc_1.requestCallback<Empty>): grpc_1.ClientUnaryCall => {
+            return super.UnlinkGroup(message, metadata, options, callback);
+        };
+        GetSubGroups: GrpcUnaryServiceInterface<JidRequest, JsonList> = (message: JidRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<JsonList>, options?: grpc_1.CallOptions | grpc_1.requestCallback<JsonList>, callback?: grpc_1.requestCallback<JsonList>): grpc_1.ClientUnaryCall => {
+            return super.GetSubGroups(message, metadata, options, callback);
+        };
+        GetLinkedGroupsParticipants: GrpcUnaryServiceInterface<JidRequest, JsonList> = (message: JidRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<JsonList>, options?: grpc_1.CallOptions | grpc_1.requestCallback<JsonList>, callback?: grpc_1.requestCallback<JsonList>): grpc_1.ClientUnaryCall => {
+            return super.GetLinkedGroupsParticipants(message, metadata, options, callback);
         };
         GetProfilePicture: GrpcUnaryServiceInterface<ProfilePictureRequest, ProfilePictureResponse> = (message: ProfilePictureRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<ProfilePictureResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<ProfilePictureResponse>, callback?: grpc_1.requestCallback<ProfilePictureResponse>): grpc_1.ClientUnaryCall => {
             return super.GetProfilePicture(message, metadata, options, callback);
