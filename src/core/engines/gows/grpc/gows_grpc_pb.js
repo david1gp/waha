@@ -708,6 +708,17 @@ function deserialize_messages_UpdateContactRequest(buffer_arg) {
   return gows_pb.UpdateContactRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_messages_UpdateNewsletterRequest(arg) {
+  if (!(arg instanceof gows_pb.UpdateNewsletterRequest)) {
+    throw new Error('Expected argument of type messages.UpdateNewsletterRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_messages_UpdateNewsletterRequest(buffer_arg) {
+  return gows_pb.UpdateNewsletterRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_messages_UpdateParticipantsRequest(arg) {
   if (!(arg instanceof gows_pb.UpdateParticipantsRequest)) {
     throw new Error('Expected argument of type messages.UpdateParticipantsRequest');
@@ -1497,6 +1508,28 @@ getSubscribedNewsletters: {
     requestDeserialize: deserialize_messages_NewsletterToggleFollowRequest,
     responseSerialize: serialize_messages_Empty,
     responseDeserialize: deserialize_messages_Empty,
+  },
+  deleteNewsletter: {
+    path: '/messages.MessageService/DeleteNewsletter',
+    requestStream: false,
+    responseStream: false,
+    requestType: gows_pb.JidRequest,
+    responseType: gows_pb.Empty,
+    requestSerialize: serialize_messages_JidRequest,
+    requestDeserialize: deserialize_messages_JidRequest,
+    responseSerialize: serialize_messages_Empty,
+    responseDeserialize: deserialize_messages_Empty,
+  },
+  updateNewsletter: {
+    path: '/messages.MessageService/UpdateNewsletter',
+    requestStream: false,
+    responseStream: false,
+    requestType: gows_pb.UpdateNewsletterRequest,
+    responseType: gows_pb.Newsletter,
+    requestSerialize: serialize_messages_UpdateNewsletterRequest,
+    requestDeserialize: deserialize_messages_UpdateNewsletterRequest,
+    responseSerialize: serialize_messages_Newsletter,
+    responseDeserialize: deserialize_messages_Newsletter,
   },
   //
 // Labels

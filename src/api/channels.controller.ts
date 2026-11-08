@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -33,6 +34,7 @@ import {
   NewsletterIdApiParam,
   NewsletterIdOrInviteCodeApiParam,
   PreviewChannelMessages,
+  UpdateChannelRequest,
 } from '@waha/structures/channels.dto';
 
 import { SessionManager } from '../core/abc/manager.abc';
@@ -88,6 +90,26 @@ export class ChannelsController {
     @Param('id') id: string,
   ) {
     return session.channelsDeleteChannel(id);
+  }
+
+  @Patch(':id')
+  @SessionApiParam
+  @NewsletterIdApiParam
+  @CheckPolicies(CanSession(Action.Send, FromParam('session')))
+  @UsePipes(new WAHAValidationPipe())
+  @ApiOperation({
+    summary: 'Update the channel',
+    description:
+      'Update name, description and/or picture.' +
+      ' Omit a field to keep it, send picture null to remove it.' +
+      ' At least one field must be set.',
+  })
+  update(
+    @WorkingSessionParam session: WhatsappSession,
+    @Param('id') id: string,
+    @Body() request: UpdateChannelRequest,
+  ): Promise<Channel> {
+    return session.channelsUpdateChannel(id, request);
   }
 
   @Get(':id')

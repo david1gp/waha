@@ -23,6 +23,7 @@ import {
   CreateChannelRequest,
   ListChannelsQuery,
   PreviewChannelMessages,
+  UpdateChannelRequest,
 } from '@waha/structures/channels.dto';
 import {
   ChatSummary,
@@ -1267,6 +1268,13 @@ export abstract class WhatsappSession {
   }
 
   public channelsDeleteChannel(id: string): Promise<void> {
+    throw new NotImplementedByEngineError();
+  }
+
+  public channelsUpdateChannel(
+    id: string,
+    request: UpdateChannelRequest,
+  ): Promise<Channel> {
     throw new NotImplementedByEngineError();
   }
 

@@ -12,6 +12,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateChannelRequest {
@@ -32,6 +33,39 @@ export class CreateChannelRequest {
     ],
   })
   picture?: RemoteFile | BinaryFile;
+}
+
+export class UpdateChannelRequest {
+  @ApiProperty({
+    example: 'Channel Name',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  name?: string;
+
+  @ApiProperty({
+    example: 'Channel Description',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiProperty({
+    oneOf: [
+      { $ref: getSchemaPath(RemoteFile) },
+      { $ref: getSchemaPath(BinaryFile) },
+    ],
+    nullable: true,
+    required: false,
+    description:
+      'Channel picture. Omit to keep, null to remove.' +
+      ' Empty update (no fields set) is rejected.',
+  })
+  @ValidateIf((o) => o.picture !== undefined)
+  picture?: RemoteFile | BinaryFile | null;
 }
 
 export enum ChannelRole {

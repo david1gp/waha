@@ -78,6 +78,7 @@ import {
   CreateChannelRequest,
   ListChannelsQuery,
   PreviewChannelMessages,
+  UpdateChannelRequest,
 } from '@waha/structures/channels.dto';
 import {
   ChatSortField,
@@ -2228,6 +2229,30 @@ export class WhatsappSessionGoWSCore extends WhatsappSession {
   @Activity()
   async setReaction(request: MessageReactionRequest) {
     const key = parseMessageIdSerialized(request.messageId);
+    if (isJidNewsletter(key.remoteJid)) {
+      // Newsletters use a dedicated reaction path server-side
+      // (NewsletterSendReaction) keyed by the numeric server id.
+      // WAHA GOWS has no local message store, so a non-numeric id can not
+      // be resolved here - callers use the `false_<jid>_<serverID>` form
+      // with the MessageServerID from the message preview.
+      const serverId = Number(key.id);
+      if (!serverId) {
+        throw new UnprocessableEntityException(
+          `Unable to get server id for channel message '${key.id}'.` +
+            ` Use the numeric server_id (MessageServerID from the message preview) as message id.`,
+        );
+      }
+      const message = new messages.MessageReaction({
+        session: this.session,
+        jid: key.remoteJid,
+        messageId: serverId.toString(),
+        reaction: request.reaction,
+        sender: key.fromMe ? this.me.id : key.participant || key.remoteJid,
+      });
+      const response = await promisify(this.client.SendReaction)(message);
+      const data = response.toObject();
+      return this.messageResponse(key.remoteJid, data);
+    }
     const message = new messages.MessageReaction({
       session: this.session,
       jid: key.remoteJid,
@@ -2618,7 +2643,64 @@ export class WhatsappSessionGoWSCore extends WhatsappSession {
 
   @Activity()
   public async channelsGetChannel(id: string): Promise<Channel> {
-    return await this.channelsGetChannelByInviteCode(id);
+    // Send the JID directly - the server splits JID vs invite handling
+    // itself (GetNewsletterInfo vs GetNewsletterInfoWithInvite).
+    // Both forms return 200 live (Task 5 baseline), so the single
+    // GetNewsletterInfo RPC is kept; this is a naming cleanup only.
+    const request = new messages.NewsletterInfoRequest({
+      session: this.session,
+      id: id,
+    });
+    const response = await promisify(this.client.GetNewsletterInfo)(request);
+    const newsletter = response.toObject() as messages.Newsletter;
+    return this.toChannel(newsletter);
+  }
+
+  @Activity()
+  public async channelsDeleteChannel(id: string): Promise<void> {
+    const request = new messages.JidRequest({
+      session: this.session,
+      jid: id,
+    });
+    const response = await promisify(this.client.DeleteNewsletter)(request);
+    response.toObject();
+  }
+
+  @Activity()
+  public async channelsUpdateChannel(
+    id: string,
+    request: UpdateChannelRequest,
+  ): Promise<Channel> {
+    if (
+      request.name === undefined &&
+      request.description === undefined &&
+      request.picture === undefined
+    ) {
+      throw new UnprocessableEntityException(
+        'At least one of name, description or picture must be provided.',
+      );
+    }
+    const req = new messages.UpdateNewsletterRequest({
+      session: this.session,
+      jid: id,
+    });
+    if (request.name !== undefined) {
+      req.name = request.name;
+    }
+    if (request.description !== undefined) {
+      req.description = request.description;
+    }
+    if (request.picture !== undefined) {
+      if (request.picture === null) {
+        req.remove_picture = true;
+      } else {
+        const media = await this.fileToMedia(request.picture);
+        req.picture = media.content;
+      }
+    }
+    const response = await promisify(this.client.UpdateNewsletter)(req);
+    const newsletter = response.toObject() as messages.Newsletter;
+    return this.toChannel(newsletter);
   }
 
   @Activity()

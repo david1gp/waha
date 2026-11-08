@@ -9147,6 +9147,230 @@ export namespace messages {
             return NewsletterToggleFollowRequest.deserialize(bytes);
         }
     }
+    export class UpdateNewsletterRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [[3], [4], [5]];
+        constructor(data?: any[] | ({
+            session?: Session;
+            jid?: string;
+            remove_picture?: boolean;
+        } & (({
+            name?: string;
+        }) | ({
+            description?: string;
+        }) | ({
+            picture?: Uint8Array;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("session" in data && data.session != undefined) {
+                    this.session = data.session;
+                }
+                if ("jid" in data && data.jid != undefined) {
+                    this.jid = data.jid;
+                }
+                if ("name" in data && data.name != undefined) {
+                    this.name = data.name;
+                }
+                if ("description" in data && data.description != undefined) {
+                    this.description = data.description;
+                }
+                if ("picture" in data && data.picture != undefined) {
+                    this.picture = data.picture;
+                }
+                if ("remove_picture" in data && data.remove_picture != undefined) {
+                    this.remove_picture = data.remove_picture;
+                }
+            }
+        }
+        get session() {
+            return pb_1.Message.getWrapperField(this, Session, 1) as Session;
+        }
+        set session(value: Session) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_session() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get jid() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set jid(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get name() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set name(value: string) {
+            pb_1.Message.setOneofField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_name() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get description() {
+            return pb_1.Message.getFieldWithDefault(this, 4, "") as string;
+        }
+        set description(value: string) {
+            pb_1.Message.setOneofField(this, 4, this.#one_of_decls[1], value);
+        }
+        get has_description() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        get picture() {
+            return pb_1.Message.getFieldWithDefault(this, 5, new Uint8Array(0)) as Uint8Array;
+        }
+        set picture(value: Uint8Array) {
+            pb_1.Message.setOneofField(this, 5, this.#one_of_decls[2], value);
+        }
+        get has_picture() {
+            return pb_1.Message.getField(this, 5) != null;
+        }
+        get remove_picture() {
+            return pb_1.Message.getFieldWithDefault(this, 6, false) as boolean;
+        }
+        set remove_picture(value: boolean) {
+            pb_1.Message.setField(this, 6, value);
+        }
+        get _name() {
+            const cases: {
+                [index: number]: "none" | "name";
+            } = {
+                0: "none",
+                3: "name"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [3])];
+        }
+        get _description() {
+            const cases: {
+                [index: number]: "none" | "description";
+            } = {
+                0: "none",
+                4: "description"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [4])];
+        }
+        get _picture() {
+            const cases: {
+                [index: number]: "none" | "picture";
+            } = {
+                0: "none",
+                5: "picture"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [5])];
+        }
+        static fromObject(data: {
+            session?: ReturnType<typeof Session.prototype.toObject>;
+            jid?: string;
+            name?: string;
+            description?: string;
+            picture?: Uint8Array;
+            remove_picture?: boolean;
+        }): UpdateNewsletterRequest {
+            const message = new UpdateNewsletterRequest({});
+            if (data.session != null) {
+                message.session = Session.fromObject(data.session);
+            }
+            if (data.jid != null) {
+                message.jid = data.jid;
+            }
+            if (data.name != null) {
+                message.name = data.name;
+            }
+            if (data.description != null) {
+                message.description = data.description;
+            }
+            if (data.picture != null) {
+                message.picture = data.picture;
+            }
+            if (data.remove_picture != null) {
+                message.remove_picture = data.remove_picture;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                session?: ReturnType<typeof Session.prototype.toObject>;
+                jid?: string;
+                name?: string;
+                description?: string;
+                picture?: Uint8Array;
+                remove_picture?: boolean;
+            } = {};
+            if (this.session != null) {
+                data.session = this.session.toObject();
+            }
+            if (this.jid != null) {
+                data.jid = this.jid;
+            }
+            if (this.name != null) {
+                data.name = this.name;
+            }
+            if (this.description != null) {
+                data.description = this.description;
+            }
+            if (this.picture != null) {
+                data.picture = this.picture;
+            }
+            if (this.remove_picture != null) {
+                data.remove_picture = this.remove_picture;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_session)
+                writer.writeMessage(1, this.session, () => this.session.serialize(writer));
+            if (this.jid.length)
+                writer.writeString(2, this.jid);
+            if (this.has_name)
+                writer.writeString(3, this.name);
+            if (this.has_description)
+                writer.writeString(4, this.description);
+            if (this.has_picture)
+                writer.writeBytes(5, this.picture);
+            if (this.remove_picture != false)
+                writer.writeBool(6, this.remove_picture);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UpdateNewsletterRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new UpdateNewsletterRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.session, () => message.session = Session.deserialize(reader));
+                        break;
+                    case 2:
+                        message.jid = reader.readString();
+                        break;
+                    case 3:
+                        message.name = reader.readString();
+                        break;
+                    case 4:
+                        message.description = reader.readString();
+                        break;
+                    case 5:
+                        message.picture = reader.readBytes();
+                        break;
+                    case 6:
+                        message.remove_picture = reader.readBool();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): UpdateNewsletterRequest {
+            return UpdateNewsletterRequest.deserialize(bytes);
+        }
+    }
     export class DownloadMediaRequest extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
@@ -12391,6 +12615,24 @@ export namespace messages {
                 responseSerialize: (message: Empty) => Buffer.from(message.serialize()),
                 responseDeserialize: (bytes: Buffer) => Empty.deserialize(new Uint8Array(bytes))
             },
+            DeleteNewsletter: {
+                path: "/messages.MessageService/DeleteNewsletter",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: JidRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => JidRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: Empty) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => Empty.deserialize(new Uint8Array(bytes))
+            },
+            UpdateNewsletter: {
+                path: "/messages.MessageService/UpdateNewsletter",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: UpdateNewsletterRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => UpdateNewsletterRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: Newsletter) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => Newsletter.deserialize(new Uint8Array(bytes))
+            },
             GetLabels: {
                 path: "/messages.MessageService/GetLabels",
                 requestStream: false,
@@ -12601,6 +12843,8 @@ export namespace messages {
         abstract CreateNewsletter(call: grpc_1.ServerUnaryCall<CreateNewsletterRequest, Newsletter>, callback: grpc_1.sendUnaryData<Newsletter>): void;
         abstract NewsletterToggleMute(call: grpc_1.ServerUnaryCall<NewsletterToggleMuteRequest, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
         abstract NewsletterToggleFollow(call: grpc_1.ServerUnaryCall<NewsletterToggleFollowRequest, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
+        abstract DeleteNewsletter(call: grpc_1.ServerUnaryCall<JidRequest, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
+        abstract UpdateNewsletter(call: grpc_1.ServerUnaryCall<UpdateNewsletterRequest, Newsletter>, callback: grpc_1.sendUnaryData<Newsletter>): void;
         abstract GetLabels(call: grpc_1.ServerUnaryCall<GetLabelsRequest, JsonList>, callback: grpc_1.sendUnaryData<JsonList>): void;
         abstract UpsertLabel(call: grpc_1.ServerUnaryCall<UpsertLabelRequest, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
         abstract DeleteLabel(call: grpc_1.ServerUnaryCall<DeleteLabelRequest, Empty>, callback: grpc_1.sendUnaryData<Empty>): void;
@@ -12813,6 +13057,12 @@ export namespace messages {
         };
         NewsletterToggleFollow: GrpcUnaryServiceInterface<NewsletterToggleFollowRequest, Empty> = (message: NewsletterToggleFollowRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<Empty>, options?: grpc_1.CallOptions | grpc_1.requestCallback<Empty>, callback?: grpc_1.requestCallback<Empty>): grpc_1.ClientUnaryCall => {
             return super.NewsletterToggleFollow(message, metadata, options, callback);
+        };
+        DeleteNewsletter: GrpcUnaryServiceInterface<JidRequest, Empty> = (message: JidRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<Empty>, options?: grpc_1.CallOptions | grpc_1.requestCallback<Empty>, callback?: grpc_1.requestCallback<Empty>): grpc_1.ClientUnaryCall => {
+            return super.DeleteNewsletter(message, metadata, options, callback);
+        };
+        UpdateNewsletter: GrpcUnaryServiceInterface<UpdateNewsletterRequest, Newsletter> = (message: UpdateNewsletterRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<Newsletter>, options?: grpc_1.CallOptions | grpc_1.requestCallback<Newsletter>, callback?: grpc_1.requestCallback<Newsletter>): grpc_1.ClientUnaryCall => {
+            return super.UpdateNewsletter(message, metadata, options, callback);
         };
         GetLabels: GrpcUnaryServiceInterface<GetLabelsRequest, JsonList> = (message: GetLabelsRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<JsonList>, options?: grpc_1.CallOptions | grpc_1.requestCallback<JsonList>, callback?: grpc_1.requestCallback<JsonList>): grpc_1.ClientUnaryCall => {
             return super.GetLabels(message, metadata, options, callback);

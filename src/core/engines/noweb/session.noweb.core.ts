@@ -113,6 +113,7 @@ import {
   CreateChannelRequest,
   ListChannelsQuery,
   PreviewChannelMessages,
+  UpdateChannelRequest,
 } from '@waha/structures/channels.dto';
 import {
   ChatSummary,
@@ -2954,6 +2955,47 @@ export class WhatsappSessionNoWebCore extends WhatsappSession {
   @Activity()
   public async channelsDeleteChannel(id: string) {
     return await this.sock.newsletterDelete(id);
+  }
+
+  @Activity()
+  public async channelsUpdateChannel(
+    id: string,
+    request: UpdateChannelRequest,
+  ) {
+    if (
+      request.name === undefined &&
+      request.description === undefined &&
+      request.picture === undefined
+    ) {
+      throw new UnprocessableEntityException(
+        'At least one of name, description or picture must be provided.',
+      );
+    }
+    if (request.name !== undefined) {
+      await this.sock.newsletterUpdateName(id, request.name);
+    }
+    if (request.description !== undefined) {
+      await this.sock.newsletterUpdateDescription(id, request.description);
+    }
+    if (request.picture !== undefined) {
+      if (request.picture === null) {
+        await this.sock.newsletterRemovePicture(id);
+      } else {
+        let file = request.picture;
+        let picture: any;
+        // @ts-ignore
+        if (file.url) {
+          file = file as RemoteFile;
+          picture = await esm.b.getStream({ url: file.url });
+          // @ts-ignore
+        } else if (file.data) {
+          file = file as BinaryFile;
+          picture = Buffer.from(file.data, 'base64');
+        }
+        await this.sock.newsletterUpdatePicture(id, picture);
+      }
+    }
+    return this.channelsGetChannel(id);
   }
 
   @Activity()
