@@ -18,11 +18,12 @@ RUN apt-get update && \
 RUN curl -fsSL https://bun.sh/install | bash
 ENV PATH="/root/.bun/bin:${PATH}"
 
-# npm packages (lockfile + vendor first for layer caching)
+# npm packages (lockfile + vendor + postinstall first for layer caching)
 WORKDIR /git
 COPY package.json .
 COPY bun.lock .
 COPY vendor ./vendor
+COPY scripts/build-git-deps.ts ./scripts/build-git-deps.ts
 
 RUN bun install --frozen-lockfile
 
