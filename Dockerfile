@@ -5,6 +5,7 @@ ARG GOLANG_IMAGE_TAG=1.24-bookworm
 # Build
 #
 FROM node:${NODE_IMAGE_TAG} AS build
+ARG PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD
 ENV PUPPETEER_SKIP_DOWNLOAD=True
 
 # git + build toolchain for git deps
