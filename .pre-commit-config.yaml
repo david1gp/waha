@@ -4,8 +4,7 @@ exclude: |
     ^src/core/engines/webjs/.*html|
     ^src/core/engines/gows/grpc/.*|
     ^src/core/engines/gows/proto/.*|
-    ^src/plus/engines/webjs/.*html|
-    ^.yarn/.*
+    ^src/plus/engines/webjs/.*html
   )$
 
 repos:

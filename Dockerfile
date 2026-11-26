@@ -8,26 +8,29 @@ FROM node:${NODE_IMAGE_TAG} AS build
 ARG PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD
 ENV PUPPETEER_SKIP_DOWNLOAD=True
 
-# git + build toolchain for git deps
+# build toolchain for the npm-built vendored git deps
+# (scripts/build-git-deps.ts) and native modules
 RUN apt-get update && \
     apt-get install -y --no-install-recommends git python3 build-essential curl ca-certificates unzip && \
     rm -rf /var/lib/apt/lists/*
 
-# npm packages
+# bun (latest) for installs
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
+
+# npm packages (lockfile + vendor first for layer caching)
 WORKDIR /git
 COPY package.json .
-COPY yarn.lock .
-COPY .yarnrc.yml .
-ENV YARN_CHECKSUM_BEHAVIOR=update
+COPY bun.lock .
+COPY vendor ./vendor
 
-RUN npm install -g corepack && corepack enable
-RUN yarn install
+RUN bun install --frozen-lockfile
 
 # App
 WORKDIR /git
 ADD . /git
-RUN yarn install
-RUN yarn build && find ./dist -name "*.d.ts" -delete
+RUN bun install --frozen-lockfile
+RUN bun run build && find ./dist -name "*.d.ts" -delete
 
 # Rebuild sharp from source on x86-64 so it runs on pre-v2 CPUs (no SSE4.2 requirement).
 # The prebuilt @img/sharp-linux-x64 binary requires x86-64-v2; -march=x86-64 limits
@@ -51,7 +54,7 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
 #
 FROM build AS test
 ENV CI=true
-RUN yarn test
+RUN bun run test:unit
 
 #
 # Dashboard

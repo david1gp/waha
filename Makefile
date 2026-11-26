@@ -35,36 +35,39 @@ push:
 	docker push devlikeapro/waha
 
 for-swagger:
-	export WHATSAPP_SWAGGER_CONFIG_ADVANCED=true && export WHATSAPP_SWAGGER_PASSWORD=666 && yarn start
+	export WHATSAPP_SWAGGER_CONFIG_ADVANCED=true && export WHATSAPP_SWAGGER_PASSWORD=666 && bun run start
 
+# NOTE: git dependencies are vendored (vendor/*.tgz + file: specs). After
+# bumping one here, refresh its tarball (docs in ops waha/README.md) or
+# fresh installs break.
 up-noweb:
-	yarn up @adiwajshing/baileys@github:devlikeapro/Baileys#fork-master-2026-04-28
+	bun add @adiwajshing/baileys@github:devlikeapro/Baileys#fork-master-2026-04-28
 
 up-noweb-libsignal:
-	yarn up libsignal@github:devlikeapro/libsignal-node#fork-master
+	bun add libsignal@github:devlikeapro/libsignal-node#fork-master
 
 up-webjs:
-	yarn up whatsapp-web.js@github:devlikeapro/whatsapp-web.js#fork-main-2026-06-26
+	bun add whatsapp-web.js@github:devlikeapro/whatsapp-web.js#fork-main-2026-06-26
 
 link-webjs:
-	yarn up whatsapp-web.js@link:../whatsapp-web.js
+	bun add whatsapp-web.js@link:../whatsapp-web.js
 
 unlink-webjs: up-webjs
 
 rebuild-noweb:
-	cd ../Baileys && yarn build
+	cd ../Baileys && bun run build
 
 link-noweb: rebuild-noweb
-	yarn up @adiwajshing/baileys@link:../Baileys
+	bun add @adiwajshing/baileys@link:../Baileys
 
 unlink-noweb: up-noweb
 
 up-wpp:
-	SHARP_IGNORE_GLOBAL_LIBVIPS=1 yarn up @wppconnect-team/wppconnect@github:wppconnect-team/wppconnect#master
-	SHARP_IGNORE_GLOBAL_LIBVIPS=1 yarn up @wppconnect/wa-js@github:wppconnect-team/wa-js#main
+	SHARP_IGNORE_GLOBAL_LIBVIPS=1 bun add @wppconnect-team/wppconnect@github:wppconnect-team/wppconnect#master
+	SHARP_IGNORE_GLOBAL_LIBVIPS=1 bun add @wppconnect/wa-js@github:wppconnect-team/wa-js#main
 
 up-rust-bridge:
-	yarn up -R whatsapp-rust-bridge
+	bun update whatsapp-rust-bridge
 
 start-proxy:
 	docker run --rm -d --name squid-container -e TZ=UTC -p 3128:3128 ubuntu/squid:5.2-22.04_beta

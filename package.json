@@ -17,17 +17,17 @@
     "start:prod-exit": "node dist/main",
     "lint": "oxlint --deny-warnings",
     "lint-fix": "oxlint --fix --deny-warnings",
-    "test": "yarn test:unit",
+    "test": "bun run test:unit",
     "test:watch": "jest --selectProjects unit --watch",
     "test:cov": "jest --selectProjects unit --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --selectProjects unit --runInBand",
     "test:unit": "jest --selectProjects unit",
     "test:e2e": "jest --selectProjects e2e",
-    "test:e8e": "yarn test:e2e",
-    "test:all": "yarn test:unit && yarn test:e8e",
+    "test:e8e": "bun run test:e2e",
+    "test:all": "bun run test:unit && bun run test:e8e",
     "gows:proto:fetch": "node scripts/gows-proto.js fetch",
     "gows:proto:build": "node scripts/gows-proto.js build",
-    "gows:proto": "yarn gows:proto:fetch && yarn gows:proto:build"
+    "gows:proto": "bun run gows:proto:fetch && bun run gows:proto:build"
   },
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
@@ -213,6 +213,5 @@
     "axios": "^1.19.0",
     "whatsapp-rust-bridge": "npm:@devlikeapro/whatsapp-rust-bridge@0.5.2",
     "sharp": "^0.35.5"
-  },
-  "packageManager": "yarn@4.17.1"
+  }
 }

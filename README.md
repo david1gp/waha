@@ -154,11 +154,11 @@ cargo install wasm-pack --vers 0.14.0 --locked
 
 4. Run the following commands:
 ```bash
-# Install dependencies
-yarn install
+# Install dependencies (also builds the vendored git deps via postinstall)
+bun install
 # Fetch and compile proto files
-yarn gows:proto
+bun run gows:proto
 # Run
-yarn start
+bun run start
 # open http://localhost:3000
 ```
